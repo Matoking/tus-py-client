@@ -64,3 +64,23 @@ class AsyncUploaderTest(unittest.TestCase):
                     self.async_uploader.upload_chunk())
 
             self.assertEqual(self.async_uploader._retried, num_of_retries)
+
+    def test_upload_verify(self):
+        self.async_uploader.verify = False
+
+        with aioresponses() as resps:
+            ssl = None
+
+            def validate_verify(url, **kwargs):
+                nonlocal ssl
+                ssl = kwargs['ssl']
+
+                response_headers = {
+                    'upload-offset': str(self.async_uploader.offset + self.async_uploader.get_request_length())
+                }
+
+                return CallbackResult(status=204, headers=response_headers)
+
+            resps.patch(self.url, status=204, callback=validate_verify)
+            self.loop.run_until_complete(self.async_uploader.upload())
+            self.assertEqual(ssl, False)
