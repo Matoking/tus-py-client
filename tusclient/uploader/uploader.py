@@ -90,8 +90,7 @@ class Uploader(BaseUploader):
 
 
 class AsyncUploader(BaseUploader):
-    def __init__(self, *args, io_loop: Optional[asyncio.AbstractEventLoop] = None, **kwargs):
-        self.io_loop = io_loop
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     async def upload(self, stop_at: Optional[int] = None):
@@ -128,7 +127,7 @@ class AsyncUploader(BaseUploader):
         Makes request to tus server to create a new upload url for the required file upload.
         """
         try:
-            async with aiohttp.ClientSession(loop=self.io_loop) as session:
+            async with aiohttp.ClientSession() as session:
                 headers = self.get_url_creation_headers()
                 ssl = None if self.verify else False
                 async with session.post(
@@ -152,7 +151,7 @@ class AsyncUploader(BaseUploader):
 
     async def _retry_or_cry(self, error):
         if self.retries > self._retried:
-            await asyncio.sleep(self.retry_delay, loop=self.io_loop)
+            await asyncio.sleep(self.retry_delay)
 
             self._retried += 1
             try:
