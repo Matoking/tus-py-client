@@ -120,9 +120,9 @@ class BaseUploader:
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
         self.offset = 0
         self.url = None
+        self.verify_tls_cert = verify_tls_cert
         self.__init_url_and_offset(url)
         self.chunk_size = chunk_size
-        self.verify_tls_cert = verify_tls_cert
         self.retries = retries
         self.request = None
         self._retried = 0
@@ -167,7 +167,7 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        resp = requests.head(self.url, headers=self.get_headers())
+        resp = requests.head(self.url, headers=self.get_headers(), verify=self.verify_tls_cert)
         offset = resp.headers.get('upload-offset')
         if offset is None:
             msg = 'Attempt to retrieve offset fails with status {}'.format(
