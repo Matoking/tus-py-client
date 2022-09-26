@@ -28,7 +28,7 @@ setup(
         'dev': [
             'tox>=2.3.1',
             'sphinx-autobuild==0.7.1',
-            'Sphinx==1.7.1'
+            'Sphinx==5.2.1'
         ]
     },
     author_email='ifedapoolarewaju@gmail.com',
